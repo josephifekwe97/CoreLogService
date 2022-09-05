@@ -5,11 +5,12 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Core.LogService.Interface;
 using Microsoft.Extensions.Configuration;
 
 namespace Core.LogService.Services
 {
-    public class MongoDbService
+    public class MongoDbService : ILogService
     {
         public IConfiguration _configuration;
 
@@ -42,7 +43,7 @@ namespace Core.LogService.Services
 
                     payload.dataSource = _configuration.GetValue<string>("MongoDb:dataSource");
 
-                    payload.filter =  JsonSerializer.Deserialize<dynamic>(filter); 
+                    payload.filter = JsonSerializer.Deserialize<dynamic>(filter);
 
                     var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
 
@@ -102,7 +103,7 @@ namespace Core.LogService.Services
         }
 
 
-        public async Task<bool> SaveLog(string data, string collection="")
+        public async Task<bool> SaveLog(string data, string collection = "")
         {
             try
             {
