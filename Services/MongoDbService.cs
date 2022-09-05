@@ -5,11 +5,12 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Core.LogService.Interface;
 using Microsoft.Extensions.Configuration;
 
 namespace Core.LogService.Services
 {
-    public class MongoDbService
+    public class MongoDbService : ILogService
     {
         public IConfiguration _configuration;
 
@@ -22,7 +23,7 @@ namespace Core.LogService.Services
         {
             try
             {
-                collection = string.IsNullOrEmpty(collection) ? _configuration.GetValue<string>("MongoDb:collection") : collection;
+                collection = string.IsNullOrEmpty(collection) ? _configuration.GetValue<string>("LogService:DefaultCollectionName") : collection;
 
                 using (var client = new HttpClient())
                 {
@@ -64,7 +65,7 @@ namespace Core.LogService.Services
         {
             try
             {
-                collection = string.IsNullOrEmpty(collection) ? _configuration.GetValue<string>("MongoDb:collection") : collection;
+                collection = string.IsNullOrEmpty(collection) ? _configuration.GetValue<string>("LogService:DefaultCollectionName") : collection;
 
                 using (var client = new HttpClient())
                 {
@@ -106,7 +107,7 @@ namespace Core.LogService.Services
         {
             try
             {
-                collection = string.IsNullOrEmpty(collection) ? _configuration.GetValue<string>("MongoDb:collection") : collection;
+                collection = string.IsNullOrEmpty(collection) ? _configuration.GetValue<string>("LogService:DefaultCollectionName") : collection;
 
                 using (var client = new HttpClient())
                 {
@@ -148,7 +149,7 @@ namespace Core.LogService.Services
         {
             try
             {
-                collection = string.IsNullOrEmpty(collection) ? _configuration.GetValue<string>("MongoDb:collection") : collection;
+                collection = string.IsNullOrEmpty(collection) ? _configuration.GetValue<string>("LogService:DefaultCollectionName") : collection;
 
                 using (var client = new HttpClient())
                 {
