@@ -9,8 +9,8 @@ namespace Core.LogService.Interface
 
         Task<bool> DeleteLog(string filter, string collection = "");
 
-        Task<bool> SaveLog(string data, string collection = "");
+        Task<bool> SaveLog(object data, string collection = "");
 
-        Task<bool> UpdateLog(string filter, string document, string collection = "");
+        Task<bool> UpdateLog(string filter, object data, string collection = "");
     }
 }
