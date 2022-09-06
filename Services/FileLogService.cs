@@ -41,7 +41,6 @@ namespace Core.LogService.Services
             }
         }
 
-
         public Task<filterResponse> FindLog(string filter, string collection = "")
         {
             //filter = "ReferenceCode:23433
@@ -83,8 +82,6 @@ namespace Core.LogService.Services
             return Task.FromResult(true);
         }
 
-
-
         public Task<bool> UpdateLog(string filter, string document, string collection = "")
         {
             collection = string.IsNullOrEmpty(collection) ? _configuration.GetValue<string>("LogService:DefaultCollectionName") : collection;
@@ -107,9 +104,6 @@ namespace Core.LogService.Services
             }
 
         }
-
-
-
         #region HelperMethods
         private string getFolderPath(string collection)
         {
@@ -122,6 +116,8 @@ namespace Core.LogService.Services
 
             return folderpath;
         }
+
+
         private string getFileNameFromData(string colletion, string data)
         {
             //ToDo: We need to extract the filename of a log from the data payload (refer to the txt file i sent you)
