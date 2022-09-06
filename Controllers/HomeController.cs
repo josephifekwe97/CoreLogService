@@ -15,7 +15,7 @@ namespace Core.LogService.Controllers
     [Route("api/[controller]")]
     public class HomeController : Controller
     {
-        public ILogService  _logService;
+        public ILogService _logService;
 
         public HomeController(IConfiguration configuration)
         {
@@ -26,6 +26,7 @@ namespace Core.LogService.Controllers
             else
                 _logService = new FileLogService(configuration);
         }
+
         // GET: api/values
         [HttpGet]
         public IEnumerable<string> Get()
@@ -42,16 +43,16 @@ namespace Core.LogService.Controllers
 
         [HttpPut]
         public async Task<ActionResult> Save([FromBody] Models.saveObj payload)
-        { 
+        {
             return Ok(await Task.Run(() => _logService.SaveLog(payload.document.ToString(), payload.collection).Result));
 
             //return Ok(await _mongoDbService.SaveLog(payload));
         }
 
         [HttpPut("update")]
-        public async Task<ActionResult> Update([FromBody] Models.updateObj payload) 
+        public async Task<ActionResult> Update([FromBody] Models.updateObj payload)
         {
-            return Ok(await Task.Run(() => _logService.UpdateLog(payload.filter.ToString(),payload.document.ToString(), payload.collection).Result));
+            return Ok(await Task.Run(() => _logService.UpdateLog(payload.filter.ToString(), payload.document.ToString(), payload.collection).Result));
 
             //return Ok(await _mongoDbService.SaveLog(payload));
         }

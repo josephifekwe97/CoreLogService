@@ -12,5 +12,7 @@ namespace Core.LogService.Interface
         Task<bool> SaveLog(string data, string collection = "");
 
         Task<bool> UpdateLog(string filter, string document, string collection = "");
+
+        public string getFileNameFromData(string colletion, string data);
     }
 }

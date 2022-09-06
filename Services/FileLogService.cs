@@ -115,7 +115,7 @@ namespace Core.LogService.Services
 
             return folderpath;
         }
-        private string getFileNameFromData(string colletion, string data)
+        public string getFileNameFromData(string colletion, string data)
         {
             //ToDo: We need to extract the filename of a log from the data payload (refer to the txt file i sent you)
             //collection: nip_accountblock_logs
@@ -124,29 +124,7 @@ namespace Core.LogService.Services
             //            "TargetAccountName":"0000000149","TargetBankVerificationNumber":"","TargetAccountNumber":"0000000149",
             //            "ReasonCode":"1","Narration":"Test Narration"}
 
-            FileStream path = new FileStream(@"D:\Bello\MidraSolution\filelogsample", FileMode.Open, FileAccess.Read);
-            StreamReader reader = new StreamReader(path);
-            string record;
-            try
-            {
-                record = reader.ReadLine();
-                while (record != null)
-                {
-                    if (record.Contains(colletion))
-                    {
-                        int lineNumber = 3;
-                        string lineContents = ReadSpecificLine(path.ToString(), lineNumber);
-                        Console.WriteLine(lineContents);
-                        record = reader.ReadLine();
-                        data = record;
-                    }
-                }
-            }
-            finally
-            {
-                reader.Close();
-                path.Close();
-            }
+            data = ReadData(colletion);
             switch (colletion)
             {
                 case "nip_accountblock_logs":
@@ -175,25 +153,35 @@ namespace Core.LogService.Services
             string content = null;
             try
             {
-                using (StreamReader file = new StreamReader(filePath))
-                {
-                    for (int i = 1; 1 < lineNumber; i++)
-                    {
-                        file.ReadLine();
-                        if (file.EndOfStream)
-                        {
-                            Console.WriteLine($"End of file. The file only contains{i} lines.");
-                            break;
-                        }
-                    }
-                    content = file.ReadLine();
-                }
+                content = File.ReadLines(filePath).Skip(lineNumber + 1).Take(1).First();
             }
             catch (IOException ex)
             {
                 Console.WriteLine("there was an error reading the file.");
                 Console.WriteLine(ex.Message);
+            }
+            return content;
+        }
 
+        private string ReadData(string collection)
+        {
+            string content = null;
+            try
+            {
+
+                foreach (var match in File.ReadLines(@"D:\Bello\MidraSolution\filelogsample")
+                          .Select((text, index) => new { text, lineNumber = index + 1 })
+                          .Where(x => x.text.Contains(collection)))
+                {
+                    content = ReadSpecificLine(@"D:\Bello\MidraSolution\filelogsample", match.lineNumber);
+
+                }
+                if (content != null)
+                    return content;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
             }
             return content;
         }
