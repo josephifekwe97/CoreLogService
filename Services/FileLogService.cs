@@ -97,6 +97,7 @@ namespace Core.LogService.Services
             return folderpath;
         }
         public string getFileNameFromData(string colletion, string data)
+        private string getFileNameFromData(string colletion, string data)
         {
             var extension = new Extension();
             var path = extension.CreateDirectory(collection);
