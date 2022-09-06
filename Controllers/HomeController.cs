@@ -26,6 +26,7 @@ namespace Core.LogService.Controllers
             else
                 _logService = new FileLogService(configuration);
         }
+
         // GET: api/values
         [HttpGet]
         public IEnumerable<string> Get()
