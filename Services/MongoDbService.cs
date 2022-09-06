@@ -23,7 +23,7 @@ namespace Core.LogService.Services
         {
             try
             {
-                collection = string.IsNullOrEmpty(collection) ? _configuration.GetValue<string>("MongoDb:collection") : collection;
+                collection = string.IsNullOrEmpty(collection) ? _configuration.GetValue<string>("LogService:DefaultCollectionName") : collection;
 
                 using (var client = new HttpClient())
                 {
@@ -43,7 +43,7 @@ namespace Core.LogService.Services
 
                     payload.dataSource = _configuration.GetValue<string>("MongoDb:dataSource");
 
-                    payload.filter = JsonSerializer.Deserialize<dynamic>(filter);
+                    payload.filter =  JsonSerializer.Deserialize<dynamic>(filter); 
 
                     var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
 
@@ -65,7 +65,7 @@ namespace Core.LogService.Services
         {
             try
             {
-                collection = string.IsNullOrEmpty(collection) ? _configuration.GetValue<string>("MongoDb:collection") : collection;
+                collection = string.IsNullOrEmpty(collection) ? _configuration.GetValue<string>("LogService:DefaultCollectionName") : collection;
 
                 using (var client = new HttpClient())
                 {
@@ -103,11 +103,11 @@ namespace Core.LogService.Services
         }
 
 
-        public async Task<bool> SaveLog(string data, string collection = "")
+        public async Task<bool> SaveLog(string data, string collection="")
         {
             try
             {
-                collection = string.IsNullOrEmpty(collection) ? _configuration.GetValue<string>("MongoDb:collection") : collection;
+                collection = string.IsNullOrEmpty(collection) ? _configuration.GetValue<string>("LogService:DefaultCollectionName") : collection;
 
                 using (var client = new HttpClient())
                 {
@@ -149,7 +149,7 @@ namespace Core.LogService.Services
         {
             try
             {
-                collection = string.IsNullOrEmpty(collection) ? _configuration.GetValue<string>("MongoDb:collection") : collection;
+                collection = string.IsNullOrEmpty(collection) ? _configuration.GetValue<string>("LogService:DefaultCollectionName") : collection;
 
                 using (var client = new HttpClient())
                 {

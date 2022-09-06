@@ -3,84 +3,158 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Core.LogService.ExtensionService;
+using Core.LogService.Data;
 using Core.LogService.Interface;
 using Core.LogService.Models;
+using Core.LogService.Utils;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 
 namespace Core.LogService.Services
 {
     public class FileLogService : ILogService
     {
         public IConfiguration _configuration;
+        private static readonly string _serverPath = ServerPath.RootPath();
 
         public FileLogService(IConfiguration configuration)
         {
             _configuration = configuration;
         }
 
-        public async Task<bool> DeleteLog(string filter, string collection = "")
+        public Task<bool> DeleteLog(string filter, string collection = "")
         {
-            var extension = new Extension();
-            var path = extension.CreateDirectory(collection);
-            // create text file
-            string fileLog = $"{path}\\document.txt";
-            // readAllLine in document.text
-            var readBeforeDelete = File.ReadAllLines(fileLog);
-            var newLines = readBeforeDelete.Where(line => !line.Contains(filter));
-            await File.WriteAllLinesAsync(fileLog, newLines);
-            FileStream fileStream = new FileStream(fileLog, FileMode.Append);
-            fileStream.Close();
-            return true;
+            collection = string.IsNullOrEmpty(collection) ? _configuration.GetValue<string>("LogService:DefaultCollectionName") : collection;
+
+            string filepath = getFolderPath(collection) + $"{getFileNameFromFilter(filter)}.txt";
+
+            if (File.Exists(filepath))
+            {
+                File.Delete(filepath);
+
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
         }
+
 
         public Task<filterResponse> FindLog(string filter, string collection = "")
         {
-            var extension = new Extension();
-            var path = extension.CreateDirectory(collection);
-            // create text file
-            string fileLog = $"{path}\\document.txt";
-            // o
-        }
+            //filter = "ReferenceCode:23433
 
-        public async Task<bool> SaveLog(object data, string collection = "")
-        {
-            //create a collection name and check if is exists
-            var extension = new Extension();
-            var path = extension.CreateDirectory(collection);
-            // create text file
-            string fileLog = $"{path}\\document.txt";
-            if (File.Exists(fileLog))
+            var response = new filterResponse()
             {
-                using (StreamWriter writer = new StreamWriter(fileLog))
-                    await writer.WriteAsync(data.ToString());
-                return true;
+                documents = new System.Collections.Generic.List<object>()
+            };
 
-            }
-            return false;
+            collection = string.IsNullOrEmpty(collection) ? _configuration.GetValue<string>("LogService:DefaultCollectionName") : collection;
 
-        }
+            string filepath = getFolderPath(collection) + $"{getFileNameFromFilter(filter)}.txt";
 
-        public async Task<bool> UpdateLog(string filter, object data, string collection = "")
-        {
-            var extension = new Extension();
-            var path = extension.CreateDirectory(collection);
-            // create text file
-            string fileLog = $"{path}\\document.txt";
-
-            if (!string.IsNullOrEmpty(filter))
+            if (File.Exists(filepath))
             {
-                StreamReader reader = new StreamReader(fileLog);
-                string content = reader.ReadToEnd();
-                reader.Close();
-                content = content.Replace(content, data.ToString());
-                StreamWriter writer = new StreamWriter(fileLog);
-                await writer.WriteAsync(content);
-                writer.Close();
-                return true;
+                var logtext = File.ReadAllText(filepath);
+
+                response.documents.Add(JsonConvert.DeserializeObject(logtext));
             }
 
-            return false;
+            return Task.FromResult(response);
         }
+
+        public Task<bool> SaveLog(string data, string collection = "")
+        {
+            collection = string.IsNullOrEmpty(collection) ? _configuration.GetValue<string>("LogService:DefaultCollectionName") : collection;
+
+            string filepath = getFolderPath(collection) + $"{getFileNameFromData(collection, data)}.txt";
+
+            if (!File.Exists(filepath)) File.Create(filepath).Dispose();
+
+            using (StreamWriter sw = File.AppendText(filepath))
+            {
+                sw.Write(data);
+                sw.Flush();
+                sw.Close();
+            }
+
+            return Task.FromResult(true);
+        }
+            return false;
+
+
+
+        public Task<bool> UpdateLog(string filter, string document, string collection = "")
+        {
+            collection = string.IsNullOrEmpty(collection) ? _configuration.GetValue<string>("LogService:DefaultCollectionName") : collection;
+
+            string filepath = getFolderPath(collection) + $"{getFileNameFromFilter(filter)}.txt";
+
+            if (File.Exists(filepath))
+            {
+                using (StreamWriter sw = File.AppendText(filepath))
+                {
+                    sw.Write(document);
+                    sw.Flush();
+                    sw.Close();
+                }
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
+
+        }
+
+
+
+        #region HelperMethods
+        private string getFolderPath(string collection)
+        {
+            string folderpath = Path.Combine(_serverPath, $"Logs/{collection}/");
+
+            if (!Directory.Exists(folderpath))
+            {
+                Directory.CreateDirectory(folderpath);
+            }
+
+            return folderpath;
+        }
+
+
+        private string getFileNameFromData(string colletion, string data)
+        {
+            //ToDo: We need to extract the filename of a log from the data payload (refer to the txt file i sent you)
+            //collection: nip_accountblock_logs
+            //keyfield: ReferenceCode
+            //samplaepayload: { "SessionID":"9999992207261008042207261008044556","DestinationInstitutionCode":"","ChannelCode":"2","ReferenceCode":"",
+            //            "TargetAccountName":"0000000149","TargetBankVerificationNumber":"","TargetAccountNumber":"0000000149",
+            //            "ReasonCode":"1","Narration":"Test Narration"}
+
+            switch (colletion)
+            {
+                case "nip_accountblock_logs":
+                    var model = JsonConvert.DeserializeObject<nip_accountblock_logs>(data);
+                    return model.ReferenceCode;
+                default:
+                    break;
+            }
+            return "";
+        }
+
+        private string getFileNameFromFilter(string filter)
+        {
+            try
+            {
+                return filter.Split(":")[1];
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Invalid Filter Data");
+            }
+        }
+        #endregion
     }
 }
