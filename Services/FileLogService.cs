@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using Core.LogService.Data;
 using Core.LogService.Interface;
 using Core.LogService.Models;
 using Core.LogService.Utils;
@@ -123,6 +124,20 @@ namespace Core.LogService.Services
         private string getFileNameFromData(string colletion, string data)
         {
             //ToDo: We need to extract the filename of a log from the data payload (refer to the txt file i sent you)
+            //collection: nip_accountblock_logs
+            //keyfield: ReferenceCode
+            //samplaepayload: { "SessionID":"9999992207261008042207261008044556","DestinationInstitutionCode":"","ChannelCode":"2","ReferenceCode":"",
+            //            "TargetAccountName":"0000000149","TargetBankVerificationNumber":"","TargetAccountNumber":"0000000149",
+            //            "ReasonCode":"1","Narration":"Test Narration"}
+
+            switch (colletion)
+            {
+                case "nip_accountblock_logs":
+                    var model = JsonConvert.DeserializeObject<nip_accountblock_logs>(data);
+                    return model.ReferenceCode;
+                default:
+                    break;
+            }
             return "";
         }
 
