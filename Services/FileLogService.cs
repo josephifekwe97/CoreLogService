@@ -37,7 +37,6 @@ namespace Core.LogService.Services
             return true;
         }
 
-
         public Task<filterResponse> FindLog(string filter, string collection = "")
         {
             var extension = new Extension();
@@ -60,11 +59,31 @@ namespace Core.LogService.Services
                     await writer.WriteAsync(data.ToString());
                 return true;
 
+            return Task.FromResult(true);
+        }
+
+        public Task<bool> UpdateLog(string filter, string document, string collection = "")
+        {
+            collection = string.IsNullOrEmpty(collection) ? _configuration.GetValue<string>("LogService:DefaultCollectionName") : collection;
+
+            string filepath = getFolderPath(collection) + $"{getFileNameFromFilter(filter)}.txt";
+
+            if (File.Exists(filepath))
+            {
+                using (StreamWriter sw = File.AppendText(filepath))
+                {
+                    sw.Write(document);
+                    sw.Flush();
+                    sw.Close();
+                }
+                return Task.FromResult(true);
             }
-            return false;
+            else
+            {
+                return Task.FromResult(false);
+            }
 
-
-
+        }
         #region HelperMethods
         private string getFolderPath(string collection)
         {
@@ -73,16 +92,41 @@ namespace Core.LogService.Services
             if (!Directory.Exists(folderpath))
             {
                 Directory.CreateDirectory(folderpath);
-        }
+            }
 
-        public async Task<bool> UpdateLog(string filter, object data, string collection = "")
+            return folderpath;
+        }
+        private string getFileNameFromData(string colletion, string data)
         {
             var extension = new Extension();
             var path = extension.CreateDirectory(collection);
             // create text file
             string fileLog = $"{path}\\document.txt";
 
-            if (!string.IsNullOrEmpty(filter))
+            FileStream path = new FileStream(@"D:\Bello\MidraSolution\filelogsample", FileMode.Open, FileAccess.Read);
+            StreamReader reader = new StreamReader(path);
+            string record;
+            try
+            {
+                record = reader.ReadLine();
+                while (record != null)
+                {
+                    if (record.Contains(colletion))
+                    {
+                        int lineNumber = 3;
+                        string lineContents = ReadSpecificLine(path.ToString(), lineNumber);
+                        Console.WriteLine(lineContents);
+                        record = reader.ReadLine();
+                        data = record;
+                    }
+                }
+            }
+            finally
+            {
+                reader.Close();
+                path.Close();
+            }
+            switch (colletion)
             {
                 StreamReader reader = new StreamReader(fileLog);
                 string content = reader.ReadToEnd();
@@ -97,5 +141,32 @@ namespace Core.LogService.Services
             return false;
         }
         #endregion
+        static string ReadSpecificLine(string filePath, int lineNumber)
+        {
+            string content = null;
+            try
+            {
+                using (StreamReader file = new StreamReader(filePath))
+                {
+                    for (int i = 1; 1 < lineNumber; i++)
+                    {
+                        file.ReadLine();
+                        if (file.EndOfStream)
+                        {
+                            Console.WriteLine($"End of file. The file only contains{i} lines.");
+                            break;
+                        }
+                    }
+                    content = file.ReadLine();
+                }
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine("there was an error reading the file.");
+                Console.WriteLine(ex.Message);
+
+            }
+            return content;
+        }
     }
 }
