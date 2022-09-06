@@ -115,7 +115,7 @@ namespace Core.LogService.Services
 
             return folderpath;
         }
-        public string getFileNameFromData(string colletion, string data)
+       
         private string getFileNameFromData(string colletion, string data)
         {
             //ToDo: We need to extract the filename of a log from the data payload (refer to the txt file i sent you)
