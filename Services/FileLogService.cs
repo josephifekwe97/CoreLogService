@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using Core.LogService.ExtensionService;
 using Core.LogService.Interface;
@@ -19,7 +20,7 @@ namespace Core.LogService.Services
             _configuration = configuration;
         }
 
-        public async Task<bool> DeleteLog(string filter, string collection = "")
+        public Task<bool> DeleteLog(string filter, string collection = "")
         {
             throw new NotImplementedException();
         }
@@ -43,12 +44,12 @@ namespace Core.LogService.Services
                 var logtext = File.ReadAllText(filepath);
 
                 response.documents.Add(JsonConvert.DeserializeObject(logtext));
-            } 
+            }
 
             return Task.FromResult(response);
         }
 
-        public async Task<bool> SaveLog(object data, string collection = "")
+        public Task<bool> SaveLog(object data, string collection = "")
         {
             throw new NotImplementedException();
         }
@@ -57,6 +58,6 @@ namespace Core.LogService.Services
         {
             throw new NotImplementedException();
         }
-        #endregion
+
     }
 }
