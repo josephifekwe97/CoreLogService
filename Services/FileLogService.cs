@@ -57,7 +57,7 @@ namespace Core.LogService.Services
                 var logtext = File.ReadAllText(filepath);
 
                 response.documents.Add(JsonConvert.DeserializeObject(logtext));
-            } 
+            }
 
             return Task.FromResult(response);
         }
