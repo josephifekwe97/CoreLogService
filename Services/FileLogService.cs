@@ -40,7 +40,6 @@ namespace Core.LogService.Services
             }
         }
 
-
         public Task<filterResponse> FindLog(string filter, string collection = "")
         {
             //filter = "ReferenceCode:23433
@@ -81,9 +80,6 @@ namespace Core.LogService.Services
 
             return Task.FromResult(true);
         }
-            return false;
-
-
 
         public Task<bool> UpdateLog(string filter, string document, string collection = "")
         {
@@ -107,9 +103,6 @@ namespace Core.LogService.Services
             }
 
         }
-
-
-
         #region HelperMethods
         private string getFolderPath(string collection)
         {
@@ -122,8 +115,6 @@ namespace Core.LogService.Services
 
             return folderpath;
         }
-
-
         private string getFileNameFromData(string colletion, string data)
         {
             //ToDo: We need to extract the filename of a log from the data payload (refer to the txt file i sent you)
@@ -133,6 +124,29 @@ namespace Core.LogService.Services
             //            "TargetAccountName":"0000000149","TargetBankVerificationNumber":"","TargetAccountNumber":"0000000149",
             //            "ReasonCode":"1","Narration":"Test Narration"}
 
+            FileStream path = new FileStream(@"D:\Bello\MidraSolution\filelogsample", FileMode.Open, FileAccess.Read);
+            StreamReader reader = new StreamReader(path);
+            string record;
+            try
+            {
+                record = reader.ReadLine();
+                while (record != null)
+                {
+                    if (record.Contains(colletion))
+                    {
+                        int lineNumber = 3;
+                        string lineContents = ReadSpecificLine(path.ToString(), lineNumber);
+                        Console.WriteLine(lineContents);
+                        record = reader.ReadLine();
+                        data = record;
+                    }
+                }
+            }
+            finally
+            {
+                reader.Close();
+                path.Close();
+            }
             switch (colletion)
             {
                 case "nip_accountblock_logs":
@@ -156,5 +170,32 @@ namespace Core.LogService.Services
             }
         }
         #endregion
+        static string ReadSpecificLine(string filePath, int lineNumber)
+        {
+            string content = null;
+            try
+            {
+                using (StreamReader file = new StreamReader(filePath))
+                {
+                    for (int i = 1; 1 < lineNumber; i++)
+                    {
+                        file.ReadLine();
+                        if (file.EndOfStream)
+                        {
+                            Console.WriteLine($"End of file. The file only contains{i} lines.");
+                            break;
+                        }
+                    }
+                    content = file.ReadLine();
+                }
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine("there was an error reading the file.");
+                Console.WriteLine(ex.Message);
+
+            }
+            return content;
+        }
     }
 }
