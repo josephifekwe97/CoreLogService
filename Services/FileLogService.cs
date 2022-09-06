@@ -96,31 +96,28 @@ namespace Core.LogService.Services
 
             return folderpath;
         }
-       
-        private string getFileNameFromData(string colletion, string data)
-        {
-            var extension = new Extension();
-            var path = extension.CreateDirectory(collection);
-            // create text file
-            string fileLog = $"{path}\\document.txt";
 
-            data = ReadData(colletion);
-            switch (colletion)
+            private string getFileNameFromData(string colletion, string data)
             {
-                StreamReader reader = new StreamReader(fileLog);
-                string content = reader.ReadToEnd();
-                reader.Close();
-                content = content.Replace(content, data.ToString());
-                StreamWriter writer = new StreamWriter(fileLog);
-                await writer.WriteAsync(content);
-                writer.Close();
-                return true;
-            }
+                //ToDo: We need to extract the filename of a log from the data payload (refer to the txt file i sent you)
+                //collection: nip_accountblock_logs
+                //keyfield: ReferenceCode
+                //samplaepayload: { "SessionID":"9999992207261008042207261008044556","DestinationInstitutionCode":"","ChannelCode":"2","ReferenceCode":"",
+                //            "TargetAccountName":"0000000149","TargetBankVerificationNumber":"","TargetAccountNumber":"0000000149",
+                //            "ReasonCode":"1","Narration":"Test Narration"}
 
-            return false;
-        }
-        #endregion
-        static string ReadSpecificLine(string filePath, int lineNumber)
+                switch (colletion)
+                {
+                    case "nip_accountblock_logs":
+                        var model = JsonConvert.DeserializeObject<nip_accountblock_logs>(data);
+                        return model.ReferenceCode;
+                    default:
+                        break;
+                }
+                return "";
+            }
+            #endregion
+            static string ReadSpecificLine(string filePath, int lineNumber)
         {
             string content = null;
             try
@@ -132,7 +129,7 @@ namespace Core.LogService.Services
                 Console.WriteLine("there was an error reading the file.");
                 Console.WriteLine(ex.Message);
             }
-            return content;
+            return "";
         }
 
         private string ReadData(string collection)
