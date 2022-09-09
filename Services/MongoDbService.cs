@@ -26,7 +26,7 @@ namespace Core.LogService.Services
         {
             try
             {
-                collection = string.IsNullOrEmpty(collection) ? _configuration.GetValue<string>("LogService:DefaultCollectionName") : collection;
+                collection = string.IsNullOrEmpty(collection) ? _configuration.GetValue<string>("MongoDb:collection") : collection;
 
                 using (var client = new HttpClient())
                 {
@@ -68,7 +68,7 @@ namespace Core.LogService.Services
         {
             try
             {
-                collection = string.IsNullOrEmpty(collection) ? _configuration.GetValue<string>("LogService:DefaultCollectionName") : collection;
+                collection = string.IsNullOrEmpty(collection) ? _configuration.GetValue<string>("MongoDb:collection") : collection;
 
                 using (var client = new HttpClient())
                 {
@@ -110,7 +110,7 @@ namespace Core.LogService.Services
         {
             try
             {
-                collection = string.IsNullOrEmpty(collection) ? _configuration.GetValue<string>("LogService:DefaultCollectionName") : collection;
+                collection = string.IsNullOrEmpty(collection) ? _configuration.GetValue<string>("MongoDb:collection") : collection;
 
                 using (var client = new HttpClient())
                 {
@@ -152,7 +152,7 @@ namespace Core.LogService.Services
         {
             try
             {
-                collection = string.IsNullOrEmpty(collection) ? _configuration.GetValue<string>("LogService:DefaultCollectionName") : collection;
+                collection = string.IsNullOrEmpty(collection) ? _configuration.GetValue<string>("MongoDb:collection") : collection;
 
                 using (var client = new HttpClient())
                 {
